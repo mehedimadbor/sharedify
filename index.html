@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>WiFi Share</title>
+<title>WiShare</title>
 <style>
-:root{--bg:#f4f6fb;--card:#fff;--tx:#12192b;--mu:#6b7488;--bd:#e3e7f0;--ac:#2f6bff;--ac2:#1fb8a6;--ok:#16a34a;--sh:0 4px 20px rgba(20,30,70,.07);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1220;--card:#161d30;--tx:#eef1fa;--mu:#8f99b3;--bd:#252e47;--ac:#5b8aff;--ac2:#35d0be;--ok:#4ade80;--sh:0 4px 20px rgba(0,0,0,.35);color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0d1220;--card:#161d30;--tx:#eef1fa;--mu:#8f99b3;--bd:#252e47;--ac:#5b8aff;--ac2:#35d0be;--ok:#4ade80;--sh:0 4px 20px rgba(0,0,0,.35);color-scheme:dark}
+:root{--bg:#f4f6fb;--card:#fff;--tx:#12192b;--mu:#6b7488;--bd:#e3e7f0;--ac:#2f6bff;--ac2:#1fb8a6;--ok:#16a34a;--bad:#dc2626;--wa:#d97706;--sh:0 4px 20px rgba(20,30,70,.07);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1220;--card:#161d30;--tx:#eef1fa;--mu:#8f99b3;--bd:#252e47;--ac:#5b8aff;--ac2:#35d0be;--ok:#4ade80;--bad:#f87171;--wa:#fbbf24;--sh:0 4px 20px rgba(0,0,0,.35);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1220;--card:#161d30;--tx:#eef1fa;--mu:#8f99b3;--bd:#252e47;--ac:#5b8aff;--ac2:#35d0be;--ok:#4ade80;--bad:#f87171;--wa:#fbbf24;--sh:0 4px 20px rgba(0,0,0,.35);color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 .app{max-width:520px;margin:0 auto;padding:18px 16px 40px}
@@ -15,9 +15,11 @@ header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
 .logo{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:grid;place-items:center;color:#fff}
 h1{font-size:20px;margin:0}.sub{color:var(--mu);font-size:13px}
 svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
-.tabs{display:flex;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:4px;margin-bottom:16px}
-.tabs button{flex:1;border:0;background:none;color:var(--mu);font:600 14px inherit;font-family:inherit;padding:10px;border-radius:10px;display:flex;gap:8px;align-items:center;justify-content:center;cursor:pointer}
+.tabs{display:flex;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:4px;margin-bottom:16px;gap:2px}
+.tabs button{flex:1;border:0;background:none;color:var(--mu);font:600 13px inherit;font-family:inherit;padding:10px 4px;border-radius:10px;display:flex;gap:6px;align-items:center;justify-content:center;cursor:pointer;position:relative}
 .tabs button.on{background:var(--ac);color:#fff}
+.tabs svg{width:18px;height:18px}
+.bdg{background:var(--bad);color:#fff;border-radius:99px;font-size:11px;padding:0 6px;line-height:17px}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:16px;box-shadow:var(--sh);margin-bottom:14px}
 label{display:block;font-size:12px;font-weight:600;color:var(--mu);margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em}
 .f{position:relative;margin-bottom:14px}
@@ -26,86 +28,92 @@ input:focus,select:focus{border-color:var(--ac)}
 .f .eye{position:absolute;right:6px;bottom:5px;border:0;background:none;color:var(--mu);padding:8px;cursor:pointer}
 .btn{border:0;border-radius:12px;background:var(--ac);color:#fff;font:600 15px inherit;font-family:inherit;padding:13px 16px;display:flex;gap:8px;align-items:center;justify-content:center;width:100%;cursor:pointer}
 .btn.ghost{background:var(--bg);color:var(--tx);border:1px solid var(--bd)}
+.sm{border:0;border-radius:10px;font:600 13px inherit;font-family:inherit;padding:8px 12px;display:inline-flex;gap:6px;align-items:center;cursor:pointer;background:var(--ac);color:#fff}
+.sm svg{width:16px;height:16px}.sm.ok{background:var(--ok)}.sm.no{background:var(--bg);color:var(--bad);border:1px solid var(--bd)}
 .item{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--bd)}
 .item:first-child{border-top:0}
 .ico{width:42px;height:42px;border-radius:12px;background:color-mix(in srgb,var(--ac) 14%,transparent);color:var(--ac);display:grid;place-items:center}
-.item.hit .ico{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.ico.pv{background:color-mix(in srgb,var(--wa) 16%,transparent);color:var(--wa)}
 .meta{flex:1;min-width:0}.name{font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tag{font-size:12px;color:var(--mu)}.hit .tag{color:var(--ok);font-weight:600}
+.tag{font-size:12px;color:var(--mu)}
 .cb{border:0;border-radius:12px;width:42px;height:42px;display:grid;place-items:center;cursor:pointer;background:var(--ok);color:#fff}
 .ib{border:0;background:none;color:var(--mu);padding:8px;cursor:pointer;border-radius:10px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}
-.chip{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--bd);border-radius:99px;padding:5px 6px 5px 12px;font-size:13px}
-.chip button{border:0;background:none;color:var(--mu);padding:2px;display:grid;cursor:pointer}.chip svg{width:14px;height:14px}
-.radar{width:96px;height:96px;margin:6px auto 12px;border-radius:50%;border:2px solid var(--bd);display:grid;place-items:center;color:var(--ac);position:relative}
-.radar.go::after{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--ac);animation:p 1.1s ease-out infinite}
-@keyframes p{from{transform:scale(.8);opacity:1}to{transform:scale(1.6);opacity:0}}
-.radar svg{width:38px;height:38px}
-.note{display:flex;gap:10px;font-size:12.5px;color:var(--mu);background:var(--bg);border:1px dashed var(--bd);border-radius:12px;padding:10px 12px;margin-top:12px}
-.note svg{width:16px;height:16px;margin-top:2px}
+.pill{font-size:12px;font-weight:600;padding:5px 10px;border-radius:99px;background:color-mix(in srgb,var(--wa) 16%,transparent);color:var(--wa)}
+.pill.bad{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;box-shadow:var(--sh)}
+.si{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;margin-bottom:8px;background:color-mix(in srgb,var(--c,var(--ac)) 15%,transparent);color:var(--c,var(--ac))}
+.sv{font-size:26px;font-weight:750;line-height:1.1}.sl{font-size:12px;color:var(--mu)}
+.rk{display:flex;align-items:center;gap:10px;padding:9px 0}
+.rn{width:24px;height:24px;border-radius:8px;background:var(--bg);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--mu)}
+.bar{height:6px;border-radius:99px;background:var(--bg);margin-top:5px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--ac),var(--ac2))}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.seg button{border:1.5px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:14px;padding:12px;text-align:left;font:600 14px inherit;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.seg button small{font:400 12px inherit;font-family:inherit;color:var(--mu)}
+.seg button.on{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 10%,transparent)}
+.srch{position:relative;margin-bottom:12px}.srch svg{position:absolute;left:12px;top:13px;color:var(--mu);width:18px;height:18px}.srch input{padding-left:38px}
 .empty{text-align:center;color:var(--mu);padding:18px 6px}
 h2{font-size:15px;margin:0 0 4px}
+.note{font-size:12.5px;color:var(--mu);background:var(--bg);border:1px dashed var(--bd);border-radius:12px;padding:10px 12px;margin-bottom:12px}
+.row2{display:flex;gap:8px;margin-top:8px}
 .modal{position:fixed;inset:0;background:rgba(8,12,24,.55);display:none;align-items:flex-end;justify-content:center;z-index:9}
 .modal.on{display:flex}
 .sheet{background:var(--card);width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:20px 18px calc(22px + env(safe-area-inset-bottom,0px));text-align:center}
 #qr{background:#fff;padding:12px;border-radius:16px;display:inline-block;margin:12px 0}
 .pw{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin:0 0 12px;text-align:left}
 .pw code{flex:1;font-size:15px;word-break:break-all}
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:20}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:20;max-width:90%;text-align:center}
 .toast.on{opacity:1}
 </style>
 </head>
 <body>
 <div class="app">
 <header>
-  <div class="logo"><svg viewBox="0 0 24 24"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9a14 14 0 0 1 20 0"/><circle cx="12" cy="19.5" r=".8"/></svg></div>
-  <div><h1>WiFi Share</h1><div class="sub">Save your network, let others connect</div></div>
+  <div class="logo" id="logo"></div>
+  <div><h1>WiShare</h1><div class="sub">Share WiFi, connect with trust</div></div>
 </header>
+<div class="note" id="banner" style="display:none">Sign in to claude.ai to load and share networks. Shared data is not available right now.</div>
 
 <div class="tabs">
-  <button id="t-scan" class="on"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Scan</button>
-  <button id="t-add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Register</button>
+  <button data-t="home" class="on" id="tb-home"></button>
+  <button data-t="find" id="tb-find"></button>
+  <button data-t="mine" id="tb-mine"></button>
 </div>
 
-<section id="v-scan">
-  <div class="card" style="text-align:center">
-    <div class="radar" id="radar"><svg viewBox="0 0 24 24"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9a14 14 0 0 1 20 0"/><circle cx="12" cy="19.5" r=".8"/></svg></div>
-    <h2>Find shared networks</h2>
-    <div class="sub" style="margin-bottom:12px">Search by your location, or type the names you see.</div>
-    <button class="btn" id="geoBtn" style="margin-bottom:14px"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>Find near me</button>
-    <div class="sub">or add WiFi names manually</div>
-    <div class="chips" id="chips" style="justify-content:center"></div>
-    <div class="f" style="display:flex;gap:8px;margin-bottom:12px">
-      <input id="ssidIn" placeholder="Type a nearby WiFi name" autocomplete="off">
-      <button class="ib" id="addChip" style="background:var(--bg);border:1px solid var(--bd)" aria-label="Add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
-    </div>
-    <button class="btn" id="scanBtn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 12 18 6"/></svg>Scan now</button>
-    <div class="note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><span>Browsers can’t read WiFi names, so “near me” uses GPS: networks saved with a location within about 150 m show up. Manual names always work too.</span></div>
+<section id="v-home"><div id="home"></div></section>
+
+<section id="v-find" style="display:none">
+  <div class="card">
+    <div class="srch" id="srch"><input id="q" placeholder="Search WiFi name" autocomplete="off"></div>
+    <button class="btn" id="geoBtn"></button>
+    <div id="nearMsg"></div>
   </div>
-  <div class="card" id="results" style="display:none"></div>
+  <div class="card"><div id="flist"></div></div>
 </section>
 
-<section id="v-add" style="display:none">
+<section id="v-mine" style="display:none">
+  <div class="card" id="reqCard" style="display:none"><h2 style="margin-bottom:4px">Access requests</h2><div id="reqs"></div></div>
   <div class="card">
     <h2>Register your WiFi</h2>
-    <div class="sub" style="margin-bottom:14px">Anyone who finds this network can see the password.</div>
+    <div class="sub" style="margin-bottom:14px">Choose who can use it.</div>
+    <div class="seg" id="vis"></div>
     <div class="f"><label for="ssid">Network name (SSID)</label><input id="ssid" autocomplete="off" placeholder="e.g. Home_5G"></div>
-    <div class="f"><label for="pw">Password</label><input id="pw" type="password" autocomplete="off" placeholder="WiFi password">
-      <button class="eye" id="eye" type="button" aria-label="Show password"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+    <div class="f"><label for="pw">Password</label><input id="pw" type="password" autocomplete="off" placeholder="WiFi password"><button class="eye" id="eye" type="button" aria-label="Show password"></button></div>
     <div class="f"><label for="sec">Security</label><select id="sec"><option value="WPA">WPA / WPA2 / WPA3</option><option value="WEP">WEP</option><option value="nopass">Open (no password)</option></select></div>
-    <button class="btn ghost" id="loc" type="button" style="margin-bottom:8px"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>Attach my location</button>
-    <div class="sub" id="locSt" style="margin:0 0 12px">Stand near the router so others can find it by GPS.</div>
-    <button class="btn" id="save"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>Save network</button>
+    <button class="btn ghost" id="loc" type="button"></button>
+    <div class="sub" id="locSt" style="margin:8px 0 14px">Stand near the router so others can find it by GPS.</div>
+    <button class="btn" id="save"></button>
   </div>
-  <div class="card"><h2 style="margin-bottom:6px">Saved networks</h2><div id="list"></div></div>
+  <div class="card"><h2 style="margin-bottom:6px">My networks</h2><div id="list"></div></div>
 </section>
 </div>
 
 <div class="modal" id="modal"><div class="sheet">
   <h2 id="mName" style="font-size:18px"></h2>
-  <div class="sub">Scan this with your phone camera to join</div>
+  <div class="sub">Scan with your phone camera to join</div>
   <div id="qr"></div>
-  <div class="pw"><code id="mPw"></code><button class="ib" id="cp" aria-label="Copy password"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button></div>
+  <div class="pw"><code id="mPw"></code><button class="ib" id="cp" aria-label="Copy password"></button></div>
   <button class="btn ghost" id="close">Close</button>
 </div></div>
 <div class="toast" id="toast"></div>
@@ -114,102 +122,224 @@ h2{font-size:15px;margin:0 0 4px}
 <script>
 (function(){
 const $=s=>document.querySelector(s);
-const WIFI='<svg viewBox="0 0 24 24"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9a14 14 0 0 1 20 0"/><circle cx="12" cy="19.5" r=".8"/></svg>';
-const LINK='<svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>';
-const TRASH='<svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
-const XI='<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>';
-let nets=[],nearby=[],db=null,me=null,col=null,scanned=false,dist={},pos=null,geo={msg:'',all:false};
-const norm=s=>s.trim().toLowerCase();
-const idOf=s=>Array.from(new TextEncoder().encode(norm(s))).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,180);
+const ic=p=>'<svg viewBox="0 0 24 24">'+p+'</svg>';
+const I={
+ wifi:ic('<path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9a14 14 0 0 1 20 0"/><circle cx="12" cy="19.5" r=".8"/>'),
+ lock:ic('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'),
+ globe:ic('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'),
+ link:ic('<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'),
+ key:ic('<circle cx="8" cy="15" r="4"/><path d="m11 12 8-8M16 7l3 3"/>'),
+ check:ic('<path d="M5 12l5 5 9-10"/>'),
+ x:ic('<path d="M6 6l12 12M18 6 6 18"/>'),
+ pin:ic('<path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/>'),
+ trash:ic('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/>'),
+ users:ic('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/>'),
+ zap:ic('<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/>'),
+ home:ic('<path d="M3 11 12 4l9 7M5 10v10h14V10"/>'),
+ search:ic('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'),
+ user:ic('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'),
+ copy:ic('<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>'),
+ eye:ic('<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>')
+};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)}
+const norm=s=>String(s).trim().toLowerCase();
+const idOf=s=>Array.from(new TextEncoder().encode(norm(s))).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,100);
+const sid=s=>String(s).slice(-4);
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2400)}
 
-/* storage: shared db when available, else this browser only */
-function lsGet(){try{return JSON.parse(localStorage.getItem('wifis')||'[]')}catch(e){return[]}}
-function lsSet(){try{localStorage.setItem('wifis',JSON.stringify(nets))}catch(e){}}
-nets=lsGet();
+/* static icons */
+$('#logo').innerHTML=I.wifi;
+$('#tb-home').innerHTML=I.home+'Home';$('#tb-find').innerHTML=I.search+'Discover';$('#tb-mine').innerHTML=I.user+'My WiFi<span id="bdg"></span>';
+$('#srch').insertAdjacentHTML('afterbegin',I.search);
+$('#geoBtn').innerHTML=I.pin+'Find near me';
+$('#eye').innerHTML=I.eye;$('#loc').innerHTML=I.pin+'Attach my location';
+$('#save').innerHTML=I.check+'Save network';$('#cp').innerHTML=I.copy;
+$('#vis').innerHTML='<button data-v="public" class="on">'+I.globe+'Public<small>Anyone can connect</small></button><button data-v="private">'+I.lock+'Private<small>Owner approval needed</small></button>';
+
+let db=null,me=null,W=[],R=[],U=[],secrets={},vis='public',q='',near=null,pos=null;
+const memK={};
+
+/* data */
+function sub(path,cb){db.collection(path).onSnapshot(s=>{cb(s.docs.map(d=>Object.assign({id:d.id},d.data())));render()},()=>{})}
 (async()=>{
-  try{
-    db=await claude.use('db');const u=await claude.use('user');
-    if(u&&u.id)me=await u.id();
-    if(db){col=db.collection('wifis');
-      const timer=setTimeout(()=>{},10000);
-      col.onSnapshot(s=>{clearTimeout(timer);nets=s.docs.map(d=>Object.assign({id:d.id},d.data()));render()},()=>{db=null;col=null});}
-  }catch(e){db=null}
-  render();
+  try{db=await claude.use('db');const u=await claude.use('user');if(u&&u.id)me=await u.id()}catch(e){db=null}
+  if(!db||!me){$('#banner').style.display='';render();return}
+  sub('wifis',x=>{W=x});sub('requests',x=>{R=x});sub('uses',x=>{U=x});
+  sub('data/users/'+me,x=>{secrets={};x.forEach(d=>{secrets[d.id]=d.pw||''})});
 })();
 
-/* tabs */
-function tab(n){$('#v-scan').style.display=n==='scan'?'':'none';$('#v-add').style.display=n==='add'?'':'none';
-  $('#t-scan').classList.toggle('on',n==='scan');$('#t-add').classList.toggle('on',n==='add')}
-$('#t-scan').onclick=()=>tab('scan');$('#t-add').onclick=()=>tab('add');
-$('#eye').onclick=()=>{const p=$('#pw');p.type=p.type==='password'?'text':'password'};
-function getPos(){return new Promise((ok,no)=>{if(!navigator.geolocation)return no(new Error('na'));navigator.geolocation.getCurrentPosition(p=>ok({lat:p.coords.latitude,lng:p.coords.longitude}),no,{enableHighAccuracy:true,timeout:12000})})}
-function hav(a,b,c,d){const R=6371000,r=x=>x*Math.PI/180,dl=r(c-a),dn=r(d-b),h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
-$('#loc').onclick=async()=>{try{pos=await getPos();$('#locSt').textContent='Location attached.'}catch(e){pos=null;$('#locSt').textContent='Could not get location. Allow location access and try again.'}};
-$('#geoBtn').onclick=async()=>{const r=$('#radar');r.classList.add('go');dist={};geo={msg:'',all:false};
-  try{const p=await getPos();let withLoc=0;
-    nets.forEach(n=>{if(n.lat!=null&&n.lng!=null){withLoc++;const d=hav(p.lat,p.lng,n.lat,n.lng);if(d<=150)dist[n.id]=d}});
-    if(!Object.keys(dist).length){geo.all=true;geo.msg=withLoc?'No network within 150 m of you. Showing all registered networks instead.':'No registered network has a saved location yet. Showing all registered networks instead.'}}
-  catch(e){geo.all=true;geo.msg='Location is blocked or unavailable here, so GPS search cannot run. Showing all registered networks instead. Open the page in a normal browser tab and allow location to use GPS.'}
-  scanned=true;r.classList.remove('go');render()};
+const isPub=w=>(w.vis||'public')==='public';
+function access(w){
+  if(w.owner===me)return 'own';
+  if(isPub(w))return 'ok';
+  const r=R.find(x=>x.id===w.id+'_'+me);
+  return r?r.status:'none';
+}
 
-/* register */
-$('#save').onclick=async()=>{
+/* crypto for private networks: password is encrypted for the approved user only */
+const EC={name:'ECDH',namedCurve:'P-256'},AES={name:'AES-GCM',length:256};
+const b64=u=>btoa(String.fromCharCode(...new Uint8Array(u)));
+const ub=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const S=()=>crypto.subtle;
+function keep(id,j){memK[id]=j;try{localStorage.setItem('k_'+id,JSON.stringify(j))}catch(e){}}
+function recall(id){if(memK[id])return memK[id];try{return JSON.parse(localStorage.getItem('k_'+id)||'null')}catch(e){return null}}
+async function requestAccess(w){
+  try{
+    const kp=await S().generateKey(EC,true,['deriveKey']);
+    const rid=w.id+'_'+me;
+    keep(rid,await S().exportKey('jwk',kp.privateKey));
+    await db.collection('requests').doc(rid).set({wifi:w.id,ssid:w.ssid,owner:w.owner,requester:me,pub:await S().exportKey('jwk',kp.publicKey),status:'pending',ts:Date.now()});
+    toast('Request sent to the owner');
+  }catch(e){toast('Could not send request')}
+}
+async function approve(r){
+  try{
+    const w=W.find(x=>x.id===r.wifi);
+    const pw=secrets['s_'+r.wifi];
+    if(pw==null){return toast('Password not found on this device')}
+    const eph=await S().generateKey(EC,true,['deriveKey']);
+    const pub=await S().importKey('jwk',r.pub,EC,false,[]);
+    const key=await S().deriveKey({name:'ECDH',public:pub},eph.privateKey,AES,false,['encrypt']);
+    const iv=crypto.getRandomValues(new Uint8Array(12));
+    const ct=await S().encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(pw));
+    await db.collection('requests').doc(r.id).update({status:'approved',epub:await S().exportKey('jwk',eph.publicKey),iv:b64(iv),ct:b64(ct)});
+    toast('Access granted');
+  }catch(e){toast('Could not approve')}
+}
+async function decryptFor(r){
+  const j=recall(r.id);if(!j||!r.epub)return null;
+  const priv=await S().importKey('jwk',j,EC,false,['deriveKey']);
+  const pub=await S().importKey('jwk',r.epub,EC,false,[]);
+  const key=await S().deriveKey({name:'ECDH',public:pub},priv,AES,false,['decrypt']);
+  return new TextDecoder().decode(await S().decrypt({name:'AES-GCM',iv:ub(r.iv)},key,ub(r.ct)));
+}
+async function getPw(w){
+  const a=access(w);
+  if(a==='own')return isPub(w)?(w.pw||''):(secrets['s_'+w.id]??null);
+  if(a==='ok')return w.pw||'';
+  if(a==='approved'){try{return await decryptFor(R.find(x=>x.id===w.id+'_'+me))}catch(e){return null}}
+  return null;
+}
+
+/* actions */
+async function logUse(w){
+  try{const id=w.id+'__'+me,p=U.find(x=>x.id===id);
+    await db.collection('uses').doc(id).set({wifi:w.id,ssid:w.ssid,owner:w.owner,user:me,count:(p?p.count:0)+1,ts:Date.now()})}catch(e){}
+}
+async function connect(w){
+  const pw=await getPw(w);
+  if(pw===null)return toast('Password is not available on this device. Ask for access again.');
+  $('#mName').textContent=w.ssid;$('#mPw').textContent=w.sec==='nopass'?'(no password)':pw;
+  const qr=$('#qr');qr.innerHTML='';
+  const e=s=>String(s).replace(/([\\;,":])/g,'\\$1');
+  const str='WIFI:T:'+(w.sec==='nopass'?'nopass':w.sec)+';S:'+e(w.ssid)+';'+(w.sec==='nopass'?'':'P:'+e(pw)+';')+';';
+  try{new QRCode(qr,{text:str,width:190,height:190,correctLevel:QRCode.CorrectLevel.M})}catch(x){qr.textContent='QR unavailable'}
+  $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(pw);toast('Password copied')}catch(x){toast('Copy failed')}};
+  $('#modal').classList.add('on');
+  logUse(w);
+}
+async function save(){
+  if(!db||!me)return toast('Sign in to claude.ai first');
   const ssid=$('#ssid').value.trim(),pw=$('#pw').value,sec=$('#sec').value;
   if(!ssid)return toast('Enter the network name');
   if(sec!=='nopass'&&!pw)return toast('Enter the password');
-  const rec={ssid,pw:sec==='nopass'?'':pw,sec,owner:me||'local',ts:Date.now()};
+  const id=idOf(ssid),ex=W.find(x=>x.id===id);
+  if(ex&&ex.owner!==me)return toast('This name is already registered by someone else');
+  const rec={ssid,sec,vis,owner:me,ts:Date.now(),pw:vis==='public'&&sec!=='nopass'?pw:''};
   if(pos){rec.lat=pos.lat;rec.lng=pos.lng}
-  const id=idOf(ssid);
   try{
-    if(col){await col.doc(id).set(rec)}
-    else{nets=nets.filter(n=>n.id!==id);nets.push(Object.assign({id},rec));lsSet();render()}
-    $('#ssid').value='';$('#pw').value='';toast('Network saved');
+    if(vis==='private')await db.collection('data/users/'+me).doc('s_'+id).set({pw:sec==='nopass'?'':pw});
+    await db.collection('wifis').doc(id).set(rec);
+    $('#ssid').value='';$('#pw').value='';toast(vis==='private'?'Saved as private':'Saved as public');
   }catch(e){toast('Could not save, try again')}
-};
-async function del(id){try{if(col)await col.doc(id).delete();else{nets=nets.filter(n=>n.id!==id);lsSet();render()}}catch(e){toast('Not allowed to delete')}}
+}
+async function del(id){
+  try{await db.collection('wifis').doc(id).delete()}catch(e){return toast('Could not delete')}
+  try{await db.collection('data/users/'+me).doc('s_'+id).delete()}catch(e){}
+}
+async function setStatus(id,s){try{await db.collection('requests').doc(id).update({status:s});toast(s==='declined'?'Request declined':'Updated')}catch(e){toast('Failed')}}
 
-/* nearby chips */
-function chips(){const c=$('#chips');c.innerHTML=nearby.map((s,i)=>`<span class="chip">${esc(s)}<button data-i="${i}" aria-label="Remove">${XI}</button></span>`).join('');
-  c.querySelectorAll('button').forEach(b=>b.onclick=()=>{nearby.splice(+b.dataset.i,1);chips();render()})}
-function addNearby(){const v=$('#ssidIn').value.trim();if(!v)return;
-  if(!nearby.some(x=>norm(x)===norm(v)))nearby.push(v);$('#ssidIn').value='';chips()}
-$('#addChip').onclick=addNearby;
-$('#ssidIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addNearby()}});
-$('#scanBtn').onclick=()=>{addNearby();const r=$('#radar');r.classList.add('go');scanned=false;dist={};geo={msg:'',all:false};render();
-  setTimeout(()=>{r.classList.remove('go');scanned=true;render()},1300)};
+/* location */
+function getPos(){return new Promise((ok,no)=>{if(!navigator.geolocation)return no(new Error('na'));navigator.geolocation.getCurrentPosition(p=>ok({lat:p.coords.latitude,lng:p.coords.longitude}),no,{enableHighAccuracy:true,timeout:12000})})}
+function hav(a,b,c,d){const R=6371000,r=x=>x*Math.PI/180,dl=r(c-a),dn=r(d-b),h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+async function findNear(){
+  const b=$('#geoBtn');b.style.opacity=.6;
+  near={d:{},all:false,msg:''};
+  try{const p=await getPos();let withLoc=0;
+    W.forEach(n=>{if(n.lat!=null&&n.lng!=null){withLoc++;const d=hav(p.lat,p.lng,n.lat,n.lng);if(d<=150)near.d[n.id]=d}});
+    if(!Object.keys(near.d).length){near.all=true;near.msg=withLoc?'No network within 150 m of you. Showing all networks.':'No network has a saved location yet. Showing all networks.'}
+  }catch(e){near.all=true;near.msg='Location is blocked or unavailable here. Showing all networks. Open the page in a normal browser tab and allow location to use GPS.'}
+  b.style.opacity=1;render();
+}
 
 /* render */
-function row(n,hit){return `<div class="item ${hit?'hit':''}"><div class="ico">${WIFI}</div><div class="meta"><div class="name">${esc(n.ssid)}</div><div class="tag">${hit?(dist[n.id]!=null?'Registered · about '+Math.round(dist[n.id])+' m away':(geo.all?'Registered':'Registered · in range')):(n.sec==='nopass'?'Open network':'Secured')}</div></div>${hit?`<button class="cb" data-c="${n.id}" aria-label="Connect to ${esc(n.ssid)}">${LINK}</button>`:''}</div>`}
-function render(){
-  const set=new Set(nearby.map(norm));
-  const hits=(geo.all?nets.slice():nets.filter(n=>set.has(norm(n.ssid))||dist[n.id]!=null)).sort((a,b)=>(dist[a.id]??1e9)-(dist[b.id]??1e9));
-  const box=$('#results');
-  if(scanned){box.style.display='';
-    box.innerHTML=`<h2>${hits.length?hits.length+' network'+(hits.length>1?'s':'')+' found':'No match'}</h2>`+(geo.msg?`<div class="sub" style="margin:4px 0 8px">${esc(geo.msg)}</div>`:'')+
-      (hits.length?hits.map(n=>row(n,true)).join(''):`<div class="empty">None of the names you entered are registered yet.</div>`);
-  }else box.style.display='none';
-  box.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>connect(nets.find(n=>n.id===b.dataset.c)));
-  const l=$('#list');
-  l.innerHTML=nets.length?nets.slice().sort((a,b)=>b.ts-a.ts).map(n=>`<div class="item"><div class="ico">${WIFI}</div><div class="meta"><div class="name">${esc(n.ssid)}</div><div class="tag">${n.sec==='nopass'?'Open':'Secured'}</div></div>${(n.owner===(me||'local'))?`<button class="ib" data-d="${n.id}" aria-label="Delete">${TRASH}</button>`:''}</div>`).join(''):`<div class="empty">No networks saved yet.</div>`;
-  l.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>del(b.dataset.d));
+function home(){
+  const owners=new Set(W.map(w=>w.owner)),users=new Set(U.map(u=>u.user));
+  const total=U.reduce((a,u)=>a+(u.count||0),0),pub=W.filter(isPub).length;
+  const agg={};U.forEach(u=>{agg[u.wifi]=(agg[u.wifi]||0)+(u.count||0)});
+  const top=Object.keys(agg).map(id=>({c:agg[id],w:W.find(x=>x.id===id)})).filter(x=>x.w).sort((a,b)=>b.c-a.c).slice(0,5);
+  const mx=top.length?top[0].c:1;
+  const st=(ico,v,l,c)=>'<div class="stat" style="--c:'+c+'"><div class="si">'+ico+'</div><div class="sv">'+v+'</div><div class="sl">'+l+'</div></div>';
+  $('#home').innerHTML='<div class="grid">'+
+    st(I.users,owners.size,'People sharing WiFi','var(--ac)')+
+    st(I.wifi,W.length,'Networks shared ('+pub+' public, '+(W.length-pub)+' private)','var(--ac2)')+
+    st(I.user,users.size,'People who connected','var(--ok)')+
+    st(I.zap,total,'Total connections','var(--wa)')+'</div>'+
+    '<div class="card"><h2>Most used WiFi</h2>'+(top.length?top.map((t,i)=>'<div class="rk"><div class="rn">'+(i+1)+'</div><div class="meta"><div class="name">'+esc(t.w.ssid)+'</div><div class="bar"><i style="width:'+Math.max(6,Math.round(t.c/mx*100))+'%"></i></div></div><div style="font-weight:700">'+t.c+'</div></div>').join(''):'<div class="empty">No connections yet. Be the first to connect.</div>')+'</div>';
 }
-chips();render();
+function actionFor(w){
+  const a=access(w);
+  if(a==='own'||a==='ok'||a==='approved')return '<button class="cb" data-c="'+w.id+'" aria-label="Connect to '+esc(w.ssid)+'">'+I.link+'</button>';
+  if(a==='pending')return '<span class="pill">Pending</span>';
+  if(a==='declined')return '<button class="sm no" data-r="'+w.id+'">Ask again</button>';
+  return '<button class="sm" data-r="'+w.id+'">'+I.key+'Request</button>';
+}
+function find(){
+  let list=W.filter(w=>norm(w.ssid).includes(norm(q)));
+  const nm=$('#nearMsg');nm.innerHTML='';
+  if(near){
+    if(near.all)nm.innerHTML='<div class="sub" style="margin-top:10px">'+esc(near.msg)+'</div>';
+    else{list=list.filter(w=>near.d[w.id]!=null).sort((a,b)=>near.d[a.id]-near.d[b.id]);nm.innerHTML='<div class="sub" style="margin-top:10px">Showing networks within 150 m.</div>'}
+    nm.innerHTML+='<button class="sm no" id="clr" style="margin-top:8px">'+I.x+'Clear</button>';
+  }
+  $('#flist').innerHTML=list.length?list.map(w=>{
+    const pv=!isPub(w),dd=near&&near.d[w.id]!=null?' · about '+Math.round(near.d[w.id])+' m away':'';
+    return '<div class="item"><div class="ico '+(pv?'pv':'')+'">'+(pv?I.lock:I.wifi)+'</div><div class="meta"><div class="name">'+esc(w.ssid)+'</div><div class="tag">'+(pv?'Private':'Public')+dd+'</div></div>'+actionFor(w)+'</div>';
+  }).join(''):'<div class="empty">'+(W.length?'No match.':'No networks registered yet.')+'</div>';
+}
+function mine(){
+  const inc=R.filter(r=>r.owner===me&&r.status==='pending');
+  $('#reqCard').style.display=inc.length?'':'none';
+  $('#reqs').innerHTML=inc.map(r=>'<div class="item"><div class="ico pv">'+I.key+'</div><div class="meta"><div class="name">'+esc(r.ssid)+'</div><div class="tag">User ····'+esc(sid(r.requester))+' wants access</div></div><button class="sm ok" data-ok="'+r.id+'" aria-label="Accept">'+I.check+'</button><button class="sm no" data-no="'+r.id+'" aria-label="Decline">'+I.x+'</button></div>').join('');
+  const b=$('#bdg');b.className=inc.length?'bdg':'';b.textContent=inc.length||'';
+  const my=W.filter(w=>w.owner===me).sort((a,b)=>b.ts-a.ts);
+  const uses={};U.forEach(u=>{uses[u.wifi]=(uses[u.wifi]||0)+(u.count||0)});
+  $('#list').innerHTML=my.length?my.map(w=>{const pv=!isPub(w);
+    return '<div class="item"><div class="ico '+(pv?'pv':'')+'">'+(pv?I.lock:I.wifi)+'</div><div class="meta"><div class="name">'+esc(w.ssid)+'</div><div class="tag">'+(pv?'Private':'Public')+' · used '+(uses[w.id]||0)+' times</div></div><button class="ib" data-d="'+w.id+'" aria-label="Delete">'+I.trash+'</button></div>'}).join(''):'<div class="empty">You have not registered a network yet.</div>';
+}
+function render(){home();find();mine()}
 
-/* connect sheet */
-function q(s){return String(s).replace(/([\\;,":])/g,'\\$1')}
-function connect(n){
-  if(!n)return;
-  $('#mName').textContent=n.ssid;$('#mPw').textContent=n.sec==='nopass'?'(no password)':n.pw;
-  const qr=$('#qr');qr.innerHTML='';
-  const str=`WIFI:T:${n.sec==='nopass'?'nopass':n.sec};S:${q(n.ssid)};${n.sec==='nopass'?'':'P:'+q(n.pw)+';'};`;
-  try{new QRCode(qr,{text:str,width:190,height:190,correctLevel:QRCode.CorrectLevel.M})}catch(e){qr.textContent='QR unavailable'}
-  $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(n.pw);toast('Password copied')}catch(e){toast('Copy failed')}};
-  $('#modal').classList.add('on');
-}
+/* events */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t)return;
+  const d=t.dataset;
+  if(d.t){['home','find','mine'].forEach(n=>{$('#v-'+n).style.display=n===d.t?'':'none';$('#tb-'+n).classList.toggle('on',n===d.t)})}
+  else if(d.v){vis=d.v;document.querySelectorAll('#vis button').forEach(b=>b.classList.toggle('on',b.dataset.v===vis))}
+  else if(d.c)connect(W.find(w=>w.id===d.c));
+  else if(d.r){const w=W.find(x=>x.id===d.r);if(w)requestAccess(w)}
+  else if(d.ok){const r=R.find(x=>x.id===d.ok);if(r)approve(r)}
+  else if(d.no)setStatus(d.no,'declined');
+  else if(d.d){if(t.dataset.arm===d.d){del(d.d)}else{t.dataset.arm=d.d;t.style.color='var(--bad)';toast('Tap again to delete');setTimeout(()=>{delete t.dataset.arm;t.style.color=''},3000)}}
+  else if(t.id==='clr'){near=null;render()}
+});
+$('#q').addEventListener('input',e=>{q=e.target.value;find()});
+$('#geoBtn').onclick=findNear;
+$('#save').onclick=save;
+$('#eye').onclick=()=>{const p=$('#pw');p.type=p.type==='password'?'text':'password'};
+$('#loc').onclick=async()=>{try{pos=await getPos();$('#locSt').textContent='Location attached.'}catch(e){pos=null;$('#locSt').textContent='Could not get location. Allow location access and try again.'}};
 $('#close').onclick=()=>$('#modal').classList.remove('on');
 $('#modal').onclick=e=>{if(e.target.id==='modal')$('#modal').classList.remove('on')};
+render();
 })();
 </script>
 </body>
