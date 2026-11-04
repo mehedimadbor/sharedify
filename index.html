@@ -118,7 +118,7 @@ const WIFI='<svg viewBox="0 0 24 24"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 
 const LINK='<svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>';
 const TRASH='<svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
 const XI='<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>';
-let nets=[],nearby=[],db=null,me=null,col=null,scanned=false,dist={},pos=null;
+let nets=[],nearby=[],db=null,me=null,col=null,scanned=false,dist={},pos=null,geo={msg:'',all:false};
 const norm=s=>s.trim().toLowerCase();
 const idOf=s=>Array.from(new TextEncoder().encode(norm(s))).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,180);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -147,10 +147,12 @@ $('#eye').onclick=()=>{const p=$('#pw');p.type=p.type==='password'?'text':'passw
 function getPos(){return new Promise((ok,no)=>{if(!navigator.geolocation)return no(new Error('na'));navigator.geolocation.getCurrentPosition(p=>ok({lat:p.coords.latitude,lng:p.coords.longitude}),no,{enableHighAccuracy:true,timeout:12000})})}
 function hav(a,b,c,d){const R=6371000,r=x=>x*Math.PI/180,dl=r(c-a),dn=r(d-b),h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
 $('#loc').onclick=async()=>{try{pos=await getPos();$('#locSt').textContent='Location attached.'}catch(e){pos=null;$('#locSt').textContent='Could not get location. Allow location access and try again.'}};
-$('#geoBtn').onclick=async()=>{const r=$('#radar');r.classList.add('go');
-  try{const p=await getPos();dist={};nets.forEach(n=>{if(n.lat!=null&&n.lng!=null){const d=hav(p.lat,p.lng,n.lat,n.lng);if(d<=150)dist[n.id]=d}});scanned=true}
-  catch(e){toast('Allow location access to search nearby')}
-  r.classList.remove('go');render()};
+$('#geoBtn').onclick=async()=>{const r=$('#radar');r.classList.add('go');dist={};geo={msg:'',all:false};
+  try{const p=await getPos();let withLoc=0;
+    nets.forEach(n=>{if(n.lat!=null&&n.lng!=null){withLoc++;const d=hav(p.lat,p.lng,n.lat,n.lng);if(d<=150)dist[n.id]=d}});
+    if(!Object.keys(dist).length){geo.all=true;geo.msg=withLoc?'No network within 150 m of you. Showing all registered networks instead.':'No registered network has a saved location yet. Showing all registered networks instead.'}}
+  catch(e){geo.all=true;geo.msg='Location is blocked or unavailable here, so GPS search cannot run. Showing all registered networks instead. Open the page in a normal browser tab and allow location to use GPS.'}
+  scanned=true;r.classList.remove('go');render()};
 
 /* register */
 $('#save').onclick=async()=>{
@@ -175,17 +177,17 @@ function addNearby(){const v=$('#ssidIn').value.trim();if(!v)return;
   if(!nearby.some(x=>norm(x)===norm(v)))nearby.push(v);$('#ssidIn').value='';chips()}
 $('#addChip').onclick=addNearby;
 $('#ssidIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addNearby()}});
-$('#scanBtn').onclick=()=>{addNearby();const r=$('#radar');r.classList.add('go');scanned=false;dist={};render();
+$('#scanBtn').onclick=()=>{addNearby();const r=$('#radar');r.classList.add('go');scanned=false;dist={};geo={msg:'',all:false};render();
   setTimeout(()=>{r.classList.remove('go');scanned=true;render()},1300)};
 
 /* render */
-function row(n,hit){return `<div class="item ${hit?'hit':''}"><div class="ico">${WIFI}</div><div class="meta"><div class="name">${esc(n.ssid)}</div><div class="tag">${hit?(dist[n.id]!=null?'Registered · about '+Math.round(dist[n.id])+' m away':'Registered · in range'):(n.sec==='nopass'?'Open network':'Secured')}</div></div>${hit?`<button class="cb" data-c="${n.id}" aria-label="Connect to ${esc(n.ssid)}">${LINK}</button>`:''}</div>`}
+function row(n,hit){return `<div class="item ${hit?'hit':''}"><div class="ico">${WIFI}</div><div class="meta"><div class="name">${esc(n.ssid)}</div><div class="tag">${hit?(dist[n.id]!=null?'Registered · about '+Math.round(dist[n.id])+' m away':(geo.all?'Registered':'Registered · in range')):(n.sec==='nopass'?'Open network':'Secured')}</div></div>${hit?`<button class="cb" data-c="${n.id}" aria-label="Connect to ${esc(n.ssid)}">${LINK}</button>`:''}</div>`}
 function render(){
   const set=new Set(nearby.map(norm));
-  const hits=nets.filter(n=>set.has(norm(n.ssid))||dist[n.id]!=null).sort((a,b)=>(dist[a.id]??1e9)-(dist[b.id]??1e9));
+  const hits=(geo.all?nets.slice():nets.filter(n=>set.has(norm(n.ssid))||dist[n.id]!=null)).sort((a,b)=>(dist[a.id]??1e9)-(dist[b.id]??1e9));
   const box=$('#results');
   if(scanned){box.style.display='';
-    box.innerHTML=`<h2>${hits.length?hits.length+' network'+(hits.length>1?'s':'')+' found':'No match'}</h2>`+
+    box.innerHTML=`<h2>${hits.length?hits.length+' network'+(hits.length>1?'s':'')+' found':'No match'}</h2>`+(geo.msg?`<div class="sub" style="margin:4px 0 8px">${esc(geo.msg)}</div>`:'')+
       (hits.length?hits.map(n=>row(n,true)).join(''):`<div class="empty">None of the names you entered are registered yet.</div>`);
   }else box.style.display='none';
   box.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>connect(nets.find(n=>n.id===b.dataset.c)));
